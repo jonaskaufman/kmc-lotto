@@ -4,11 +4,11 @@
 #include "event_selector.hpp"
 #include <vector>
 
+namespace lotto
+{
 /*
  * Event selector implemented using rejection KMC algorithm
  */
-namespace lotto
-{
 template <typename EventIDType, typename RateCalculatorType>
 class RejectionEventSelector : public EventSelectorBase<EventIDType, RateCalculatorType>
 {
@@ -20,14 +20,16 @@ public:
           rate_upper_bound(rate_upper_bound),
           event_id_list(event_id_list)
     {
+    // TODO: add check for upper bound equaling zero
     }
 
-    // Select event, repeats until an event is accepted and returns the total time step and ID of selected event
+    // Attempts events, repeats until an event is accepted and returns the ID of selected event and total time step
     std::pair<EventIDType, double> select_event()
     {
         EventIDType selected_event_id;
         double total_time_step = 0;
         double total_rate = rate_upper_bound * event_id_list.size();
+        // TODO: add check to avoid infinite looping
         while (true)
         {
             total_time_step += this->calculate_time_step(total_rate);

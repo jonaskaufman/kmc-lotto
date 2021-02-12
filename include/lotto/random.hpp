@@ -17,7 +17,7 @@ public:
     RandomGenerator()
     {
         std::random_device device;
-        generator = std::mt19937_64(device());
+        reseed_generator(device());
     }
 
     /// Returns a random integer between 0 and maximum_value (inclusive)
@@ -33,8 +33,11 @@ private:
     /// 64-bit Mersenne Twister generator
     std::mt19937_64 generator;
 
-    /// Uniform real distribution on unit interval
-    std::uniform_real_distribution<double> uniform_unit_interval_distribution;
+    /// Reseeds the generator
+    void reseed_generator(unsigned int seed) { generator = std::mt19937_64(seed); }
+
+    //    /// Uniform real distribution on unit interval
+    //    std::uniform_real_distribution<double> uniform_unit_interval_distribution;
 };
 } // namespace lotto
 
