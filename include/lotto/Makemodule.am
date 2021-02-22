@@ -1,0 +1,5 @@
+lotto_includedir = $(includedir)/lotto
+lotto_include_HEADERS = \
+						include/lotto/random.hpp\
+						include/lotto/event_selector.hpp\
+						include/lotto/rejection.hpp
