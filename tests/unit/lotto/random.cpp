@@ -35,22 +35,21 @@ protected:
         // Check min and max
         T max_sample = *std::max_element(samples.begin(), samples.end());
         T min_sample = *std::min_element(samples.begin(), samples.end());
-        ASSERT_TRUE(min_sample >= min_value);
-        ASSERT_TRUE(max_sample <= max_value);
+        EXPECT_GE(min_sample, min_value);
+        EXPECT_LE(max_sample, max_value);
 
         // Check average
         double average = get_average(samples);
         double expected_average = (double)(min_value + max_value) / 2;
         double sigma_of_mean = expected_standard_error_of_mean(min_value, max_value, samples.size());
         // Average of samples should be *well* within 10 sigma of expected value
-        ASSERT_TRUE(std::abs(average - expected_average) < 10 * sigma_of_mean);
+        EXPECT_LT(std::abs(average - expected_average), 10 * sigma_of_mean);
     }
 };
 
 TEST_F(RandomGeneratorTest, Construct)
 {
     // Checks if RandomGenerator can be constructed
-    ASSERT_TRUE(true);
 }
 
 TEST_F(RandomGeneratorTest, GetSeed)
@@ -59,7 +58,7 @@ TEST_F(RandomGeneratorTest, GetSeed)
     for (UIntType i = 0; i < 100; ++i)
     {
         generator.reseed_generator(i);
-        ASSERT_TRUE(generator.get_seed() == i);
+        EXPECT_EQ(generator.get_seed(), i);
     }
 }
 
@@ -77,7 +76,7 @@ TEST_F(RandomGeneratorTest, DefaultSeedNotFixed)
             break;
         }
     }
-    ASSERT_TRUE(is_seed_different);
+    EXPECT_TRUE(is_seed_different);
 }
 
 TEST_F(RandomGeneratorTest, IntegerRangeSamples)
