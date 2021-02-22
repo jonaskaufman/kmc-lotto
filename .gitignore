@@ -31,5 +31,16 @@
 *.out
 *.app
 
+# Autotools generated
+Makefile.in
+*.log
+build-aux
+build
+configure
+config.h*
+*.m4
+*.cache
+configure.ac
+
 # Other
 .ycm_extra_conf.py
