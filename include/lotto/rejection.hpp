@@ -4,6 +4,8 @@
 #include "event_selector.hpp"
 #include <vector>
 
+class RejectionEventSelectorTest;
+
 namespace lotto
 {
 /*
@@ -50,6 +52,9 @@ private:
 
     // List of IDs of all possible events
     const std::vector<EventIDType> event_id_list;
+
+    // Friend for testing
+    friend class ::RejectionEventSelectorTest;
 };
 } // namespace lotto
 #endif
