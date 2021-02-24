@@ -67,7 +67,8 @@ TEST_F(RandomGeneratorTest, DefaultSeedNotFixed)
     // Checks that the default seed is not fixed
     UIntType first_seed = generator.get_seed();
     bool is_seed_different = false;
-    for (int i = 0; i < 100; ++i)
+    int n_attempts = 100;
+    for (int i = 0; i < n_attempts; ++i)
     {
         lotto::RandomGenerator new_generator;
         if (new_generator.get_seed() != first_seed)
@@ -76,7 +77,7 @@ TEST_F(RandomGeneratorTest, DefaultSeedNotFixed)
             break;
         }
     }
-    EXPECT_TRUE(is_seed_different);
+    EXPECT_TRUE(is_seed_different) << "Seed value is unchanged after " << n_attempts << " attempts, random_device implementation appears to be deterministic";
 }
 
 TEST_F(RandomGeneratorTest, IntegerRangeSamples)
