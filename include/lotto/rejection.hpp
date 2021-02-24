@@ -2,6 +2,7 @@
 #define REJECTION_H
 
 #include "event_selector.hpp"
+#include <stdexcept>
 #include <vector>
 
 class RejectionEventSelectorTest;
@@ -22,7 +23,15 @@ public:
           rate_upper_bound(rate_upper_bound),
           event_id_list(event_id_list)
     {
-    // TODO: add check for upper bound equaling zero
+        // Make sure that provided parameters make sense
+        if (rate_upper_bound <= 0.0)
+        {
+            throw std::runtime_error("Rate upper bound must be positive.");
+        }
+        if (event_id_list.empty())
+        {
+            throw std::runtime_error("Event ID list must not be empty.");
+        }
     }
 
     // Attempts events, repeats until an event is accepted and returns the ID of selected event and total time step
@@ -31,12 +40,14 @@ public:
         EventIDType selected_event_id;
         double total_time_step = 0;
         double total_rate = rate_upper_bound * event_id_list.size();
-        // TODO: add check to avoid infinite looping
+        // This could loop forever, but I don't think it makes sense to impose a limit or ask the user to do so
+        // TODO: Make note in documentation about this
         while (true)
         {
             total_time_step += this->calculate_time_step(total_rate);
             int candidate_event_id = this->random_generator.sample_integer_range(event_id_list.size() - 1);
             double rate = this->calculate_rate(candidate_event_id);
+            assert(rate <= rate_upper_bound); // rate cannot exceed upper bound
             if (rate / rate_upper_bound > this->random_generator.sample_unit_interval())
             {
                 selected_event_id = candidate_event_id;
