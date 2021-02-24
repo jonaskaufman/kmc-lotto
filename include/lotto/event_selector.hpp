@@ -3,6 +3,7 @@
 
 #include "random.hpp"
 #include <utility>
+#include <cmath>
 
 namespace lotto
 {
@@ -37,6 +38,12 @@ protected:
         // TODO: Add checks for log/div of zero
         double time_step = -std::log(random_generator.sample_unit_interval()) / total_rate;
         return time_step;
+    }
+
+    // Reseeds the generator
+    void reseed_generator(UIntType new_seed)
+    {
+        random_generator.reseed_generator(new_seed);
     }
 };
 } // namespace lotto
