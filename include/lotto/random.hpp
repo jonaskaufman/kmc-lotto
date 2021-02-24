@@ -1,10 +1,13 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include <cmath>
 #include <cstdint>
+#include <limits>
 #include <random>
 
 using UIntType = std::uint_fast64_t;
+using RealType = double;
 
 namespace lotto
 {
@@ -20,19 +23,23 @@ class RandomGenerator
 public:
     /// Default constructor, automatically seeds generator from random device
     RandomGenerator()
+        : // std::uniform_real_distribution provides the interval [a, b)
+          // so to obtain (a, b] we must shift the endpoints to the next representable values
+          unit_interval_distribution(std::nextafter(0.0, std::numeric_limits<RealType>::max()),
+                                     std::nextafter(1.0, std::numeric_limits<RealType>::max()))
     {
         std::random_device device;
         reseed_generator(device());
     }
 
-    /// Returns a random integer between 0 and maximum_value (inclusive)
+    /// Returns a random integer from the closed interval [0, maximum_value]
     UIntType sample_integer_range(UIntType maximum_value)
     {
         return std::uniform_int_distribution<UIntType>(0, maximum_value)(generator);
     }
 
-    /// Returns a random real from the unit interval (includes 0, excludes 1)
-    double sample_unit_interval() { return std::uniform_real_distribution<double>(0.0, 1.0)(generator); }
+    /// Returns a random real from the half-open unit interval (0, 1]
+    RealType sample_unit_interval() { return unit_interval_distribution(generator); }
 
     /// Returns the value used to seed the generator
     UIntType get_seed() const { return seed; }
@@ -51,7 +58,8 @@ private:
     /// Seed used for generator
     UIntType seed;
 
-    // TODO: Store distributions as members?
+    /// Half-open unit interval distribution (0, 1]
+    std::uniform_real_distribution<RealType> unit_interval_distribution;
 };
 } // namespace lotto
 
