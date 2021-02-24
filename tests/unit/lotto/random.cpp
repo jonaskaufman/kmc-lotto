@@ -1,8 +1,7 @@
+#include "statistics.hpp"
 #include <algorithm>
-#include <cmath>
 #include <gtest/gtest.h>
 #include <lotto/random.hpp>
-#include <numeric>
 #include <vector>
 
 class RandomGeneratorTest : public testing::Test
@@ -11,23 +10,10 @@ protected:
     /// Random generator for testing
     lotto::RandomGenerator generator;
 
-    /// Returns the expected standard error of the mean
-    //  for a uniform distribution between min and max
-    double expected_standard_error_of_mean(double min, double max, int n_samples)
-    {
-        return (max - min) / std::sqrt(12) / std::sqrt(n_samples);
-    }
+    /// Fixed seed for testing
+    const UIntType testing_seed = 0;
 
-    /// Returns the average of a set of values
-    template <typename T>
-    double get_average(std::vector<T> values)
-    {
-        double sum = std::accumulate(values.begin(), values.end(), 0.0);
-        double average = sum / (double)values.size();
-        return average;
-    }
-
-    /// Checks that samples satisfy bounds and expected average for a uniform
+    /// Checks that samples satisfy bounds and expected mean for a uniform
     //  distribution between min_value and max_value
     template <typename T>
     void check_samples_from_uniform_distribution(T min_value, T max_value, std::vector<T> samples)
@@ -38,12 +24,13 @@ protected:
         EXPECT_GE(min_sample, min_value);
         EXPECT_LE(max_sample, max_value);
 
-        // Check average
-        double average = get_average(samples);
-        double expected_average = (double)(min_value + max_value) / 2;
-        double sigma_of_mean = expected_standard_error_of_mean(min_value, max_value, samples.size());
-        // Average of samples should be *well* within 10 sigma of expected value
-        EXPECT_LT(std::abs(average - expected_average), 10 * sigma_of_mean);
+        // Check mean
+        double mean = get_mean(samples);
+        double expected_mean = (double)(min_value + max_value) / 2.0;
+        double sigma_of_mean =
+            standard_error_of_mean(standard_deviation_of_uniform_distribution(min_value, max_value), samples.size());
+        // Mean of samples should be *well* within 10 sigma of expected value
+        check_deviation_of_mean(mean, expected_mean, sigma_of_mean, 10);
     }
 };
 
@@ -77,13 +64,14 @@ TEST_F(RandomGeneratorTest, DefaultSeedNotFixed)
             break;
         }
     }
-    EXPECT_TRUE(is_seed_different) << "Seed value is unchanged after " << n_attempts << " attempts, random_device implementation appears to be deterministic";
+    EXPECT_TRUE(is_seed_different) << "Seed value is unchanged after " << n_attempts
+                                   << " attempts, random_device implementation appears to be deterministic";
 }
 
 TEST_F(RandomGeneratorTest, IntegerRangeSamples)
 {
     // Checks that values from sample_integer_range behave as expected
-    generator.reseed_generator(0); // fixed seed for testing
+    generator.reseed_generator(testing_seed); // fixed seed for testing
     UIntType min_value = 0;
     UIntType max_value = 1000;
     int n_samples = 100000000;
@@ -98,7 +86,7 @@ TEST_F(RandomGeneratorTest, IntegerRangeSamples)
 TEST_F(RandomGeneratorTest, UnitIntervalSamples)
 {
     // Checks that values from sample_unit_interval behave as expected
-    generator.reseed_generator(0); // fixed seed for testing
+    generator.reseed_generator(testing_seed); // fixed seed for testing
     double min_value = 0.0;
     double max_value = 1.0;
     int n_samples = 100000000;
