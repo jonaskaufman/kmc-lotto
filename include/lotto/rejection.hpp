@@ -48,7 +48,7 @@ public:
             int candidate_event_id = this->random_generator.sample_integer_range(event_id_list.size() - 1);
             double rate = this->calculate_rate(candidate_event_id);
             assert(rate <= rate_upper_bound); // rate cannot exceed upper bound
-            if (rate / rate_upper_bound > this->random_generator.sample_unit_interval())
+            if (rate / rate_upper_bound >= this->random_generator.sample_unit_interval())
             {
                 selected_event_id = candidate_event_id;
                 break;
