@@ -31,11 +31,23 @@ protected:
     EventSelectorBase(RateCalculatorType* rate_calculator) : rate_calculator(rate_calculator) {}
 
     // Returns the rate given an event ID
-    double calculate_rate(const EventIDType& event_id)
+    double calculate_rate(const EventIDType& event_id) const
     {
         double rate = rate_calculator->calculate_rate(event_id);
         assert(rate >= 0.0); // rates must be non-negative
         return rate;
+    }
+
+    // Returns a list of rates given a list of event IDs
+    std::vector<double> calculate_rates(const std::vector<EventIDType>& event_ids) const
+    {
+        std::vector<double> rates;
+        rates.reserve(event_ids.size());
+        for (const EventIDType& event_id : event_ids)
+        {
+            rates.push_back(calculate_rate(event_id));
+        }
+        return rates;
     }
 
     // Returns the time step for Poisson process, given the total rate
