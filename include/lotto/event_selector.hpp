@@ -4,6 +4,7 @@
 #include "random.hpp"
 #include <cassert>
 #include <cmath>
+#include <memory>
 #include <utility>
 
 namespace lotto
@@ -22,18 +23,21 @@ public:
 
 protected:
     // Pointer to rate calculator
-    const RateCalculatorType* rate_calculator;
+    const std::shared_ptr<RateCalculatorType> rate_calculator_ptr;
 
     // Random number generator
     RandomGenerator random_generator;
 
     // Constructor for use in derived classes
-    EventSelectorBase(RateCalculatorType* rate_calculator) : rate_calculator(rate_calculator) {}
+    EventSelectorBase(const std::shared_ptr<RateCalculatorType>& rate_calculator_ptr)
+        : rate_calculator_ptr(rate_calculator_ptr)
+    {
+    }
 
     // Returns the rate given an event ID
     double calculate_rate(const EventIDType& event_id) const
     {
-        double rate = rate_calculator->calculate_rate(event_id);
+        double rate = rate_calculator_ptr->calculate_rate(event_id);
         assert(rate >= 0.0); // rates must be non-negative
         return rate;
     }

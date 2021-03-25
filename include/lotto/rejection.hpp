@@ -2,6 +2,7 @@
 #define REJECTION_H
 
 #include "event_selector.hpp"
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -16,10 +17,10 @@ template <typename EventIDType, typename RateCalculatorType>
 class RejectionEventSelector : public EventSelectorBase<EventIDType, RateCalculatorType>
 {
 public:
-    RejectionEventSelector(RateCalculatorType* rate_calculator,
+    RejectionEventSelector(const std::shared_ptr<RateCalculatorType>& rate_calculator_ptr,
                            double rate_upper_bound,
                            const std::vector<EventIDType>& event_id_list)
-        : EventSelectorBase<EventIDType, RateCalculatorType>(rate_calculator),
+        : EventSelectorBase<EventIDType, RateCalculatorType>(rate_calculator_ptr),
           rate_upper_bound(rate_upper_bound),
           event_id_list(event_id_list)
     {

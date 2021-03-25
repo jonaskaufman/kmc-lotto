@@ -61,11 +61,12 @@ protected:
 
         // Set up event selectors
         double rate_upper_bound = 1.0;
-        uniform_rates_selector_ptr.reset(new lotto::RejectionEventSelector<ID, UniformRateCalculator>(
-            &uniform_calculator, rate_upper_bound, event_id_list));
+
+        uniform_rates_selector_ptr = std::make_unique<lotto::RejectionEventSelector<ID, UniformRateCalculator>>(
+            uniform_calculator_ptr, rate_upper_bound, event_id_list);
         uniform_rates_selector_ptr->reseed_generator(testing_seed); // fixed seed for testing
-        one_hot_rates_selector_ptr.reset(new lotto::RejectionEventSelector<ID, OneHotRateCalculator>(
-            &one_hot_calculator, rate_upper_bound, event_id_list));
+        one_hot_rates_selector_ptr = std::make_unique<lotto::RejectionEventSelector<ID, OneHotRateCalculator>>(
+            one_hot_calculator_ptr, rate_upper_bound, event_id_list);
         one_hot_rates_selector_ptr->reseed_generator(testing_seed); // fixed seed for testing
     }
 
@@ -76,8 +77,8 @@ protected:
     std::vector<ID> event_id_list;
 
     // Rate calculators
-    UniformRateCalculator uniform_calculator;
-    OneHotRateCalculator one_hot_calculator;
+    std::shared_ptr<UniformRateCalculator> uniform_calculator_ptr = std::make_shared<UniformRateCalculator>();
+    std::shared_ptr<OneHotRateCalculator> one_hot_calculator_ptr = std::make_shared<OneHotRateCalculator>();
 
     // Event selectors, stored with pointers because they have no default constructor
     std::unique_ptr<lotto::RejectionEventSelector<ID, UniformRateCalculator>> uniform_rates_selector_ptr;
@@ -95,7 +96,7 @@ TEST_F(RejectionEventSelectorTest, CorrectEventSelection)
     for (int i = 0; i < event_id_list.size(); ++i)
     {
         ID expected_event_id = i;
-        one_hot_calculator.set_hot_id(expected_event_id);
+        one_hot_calculator_ptr->set_hot_id(expected_event_id);
         auto event_and_time = one_hot_rates_selector_ptr->select_event();
         ID selected_event_id = event_and_time.first;
         EXPECT_EQ(selected_event_id, expected_event_id);
@@ -114,9 +115,9 @@ TEST_F(RejectionEventSelectorTest, AverageTimeStep)
     for (int i = 1; i <= n_steps; ++i)
     {
         double r0 = i * rate_upper_bound_step;
-        uniform_calculator.set_rate(r0);
-        uniform_rates_selector_ptr.reset(
-            new lotto::RejectionEventSelector<ID, UniformRateCalculator>(&uniform_calculator, r0, event_id_list));
+        uniform_calculator_ptr->set_rate(r0);
+        uniform_rates_selector_ptr = std::make_unique<lotto::RejectionEventSelector<ID, UniformRateCalculator>>(
+            uniform_calculator_ptr, r0, event_id_list);
 
         // Sample time steps
         std::vector<double> time_step_samples(n_samples);

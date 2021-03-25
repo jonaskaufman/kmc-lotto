@@ -4,6 +4,7 @@
 #include "event_rate_tree.hpp"
 #include "event_selector.hpp"
 #include <map>
+#include <memory>
 #include <vector>
 
 namespace lotto
@@ -17,10 +18,10 @@ class RejectionFreeEventSelector : public EventSelectorBase<EventIDType, RateCal
 {
 public:
     // Construct given a rate calculator, event ID list, and impact table
-    RejectionFreeEventSelector(RateCalculatorType* rate_calculator,
+    RejectionFreeEventSelector(const std::shared_ptr<RateCalculatorType>& rate_calculator_ptr,
                                const std::vector<EventIDType>& event_id_list,
                                const std::map<EventIDType, std::vector<EventIDType>>& impact_table)
-        : EventSelectorBase<EventIDType, RateCalculatorType>(rate_calculator),
+        : EventSelectorBase<EventIDType, RateCalculatorType>(rate_calculator_ptr),
           event_rate_tree(event_id_list, calculate_rates(event_id_list)),
           impact_table(impact_table),
           impacted_events_ptr(nullptr)
