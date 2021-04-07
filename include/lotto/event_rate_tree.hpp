@@ -8,16 +8,16 @@
 namespace lotto
 {
 /*
- * Node class to hold event rate data within a binary sum tree
+ * Class to hold event rate data within a binary sum tree node
  * For leaves, should contain an event ID and its corresponding rate
  * For non-leaves, should only contain a (summed) rate
  */
 template <typename EventIDType>
-class EventRateNode // rename to node data or something?
+class EventRateNodeData
 {
 public:
     // Construct as a leaf given an event ID and rate
-    EventRateNode(const EventIDType& event_id, double rate) : event_id(event_id), rate(rate){};
+    EventRateNodeData(const EventIDType& event_id, double rate) : event_id(event_id), rate(rate){};
 
     // Return the node's event ID (should only be called on leaves)
     const EventIDType& get_event_id() const { return event_id.value(); }
@@ -36,16 +36,16 @@ public:
     }
 
     // Return a new node with no event ID and summed rates
-    EventRateNode operator+(const EventRateNode& rhs_node) const
+    EventRateNodeData operator+(const EventRateNodeData& rhs_node) const
     {
-        EventRateNode summed_node;
+        EventRateNodeData summed_node;
         summed_node.rate = this->rate + rhs_node.rate;
         return summed_node;
     }
 
 private:
     // Construct as a non-leaf with no event ID and zero rate
-    EventRateNode() : event_id{std::nullopt}, rate(0.0){};
+    EventRateNodeData() : event_id{std::nullopt}, rate(0.0){};
 
     // Event ID, which may not exist
     const std::optional<EventIDType> event_id;
@@ -77,7 +77,7 @@ public:
     double total_rate() const;
 
 private:
-    using NodeData = EventRateNode<EventIDType>;
+    using NodeData = EventRateNodeData<EventIDType>;
     using Node = InvertedBinaryTreeNode<NodeData>;
     using Index = int;
 
