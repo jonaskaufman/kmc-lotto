@@ -80,7 +80,8 @@ protected:
         generator.reseed_generator(testing_seed);
         for (int i = 0; i < n_events; ++i)
         {
-            init_ids.push_back(i); // TODO initialize out of order?
+            ID id = 7 * i;
+            init_ids.push_back(id);
             init_rates.push_back(generator.sample_unit_interval());
         }
         tree_ptr = std::make_unique<lotto::EventRateTree<ID>>(init_ids, init_rates);
@@ -119,7 +120,20 @@ protected:
     }
 };
 
-TEST_F(EventRateTreeTest, Construct) {}
+TEST_F(EventRateTreeTest, Construct)
+{
+    // Checks construction and data correctness
+    auto leaf_ids = get_leaf_ids();
+    auto leaf_rates = get_leaf_rates();
+    auto rate_it = init_rates.begin();
+    for (auto id_it = init_ids.begin(); id_it != init_ids.end(); ++id_it)
+    {
+        auto leaf_ix = event_to_leaf_index().at(*id_it);
+        EXPECT_EQ(*id_it, leaf_ids[leaf_ix]);
+        EXPECT_EQ(*rate_it, leaf_rates[leaf_ix]);
+        ++rate_it;
+    }
+}
 
 TEST_F(EventRateTreeTest, TotalRate)
 {
@@ -134,7 +148,7 @@ TEST_F(EventRateTreeTest, UpdateRate)
     int n_updates = 100;
     for (int i = 0; i < n_updates; ++i)
     {
-        ID id_to_update = generator.sample_integer_range(n_events - 1);
+        ID id_to_update = init_ids[generator.sample_integer_range(n_events - 1)];
         auto leaf_ix = event_to_leaf_index().at(id_to_update);
         double new_rate = generator.sample_unit_interval();
         double delta_rate = new_rate - get_leaf_rates()[leaf_ix];
