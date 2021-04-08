@@ -5,6 +5,8 @@
 #include <map>
 #include <optional>
 
+using Index = long int;
+
 namespace lotto
 {
 /*
@@ -67,22 +69,22 @@ public:
 private:
     using NodeData = EventRateNodeData<EventIDType>;
     using Node = InvertedBinaryTreeNode<NodeData>;
-    using Index = int;
 
-    //
+    // Tree to store events and their rates, and to quickly select events
     InvertedBinarySumTree<NodeData> event_rate_tree;
 
-    //
-    const std::map<EventIDType, Index> event_to_leaf_index; // needed for updating tree itself given an EventID
+    // Given an EventID, get the corresponding index into the tree leaves
+    const std::map<EventIDType, Index> event_to_leaf_index;
 
-    //
+    // Generate the leaf index map for all events in tree
+    std::map<EventIDType, Index> event_to_leaf_index_map() const;
+
+    // Convert all events and their rates into leaf node data for initialization
     std::vector<NodeData> events_as_leaves(const std::vector<EventIDType>& init_events,
                                            const std::vector<double>& init_rates) const;
 
-    //
-    std::map<EventIDType, Index> event_to_leaf_index_map() const;
-
-    //
+    // Based on the rate of the children nodes, pick the left or right
+    // child, and subtract the rate out
     const Node* bifurcate(const Node* current_node_ptr, double& running_rate) const;
 };
 
