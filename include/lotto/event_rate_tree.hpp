@@ -5,10 +5,10 @@
 #include <map>
 #include <optional>
 
-using Index = long int;
-
 namespace lotto
 {
+using Index = long int;
+
 /*
  * Class to hold event rate data within a binary sum tree node
  * For leaves, should contain an event ID and its corresponding rate
@@ -86,6 +86,7 @@ private:
     // Based on the rate of the children nodes, pick the left or right
     // child, and subtract the rate out
     const Node* bifurcate(const Node* current_node_ptr, double& running_rate) const;
+
 };
 
 } // namespace lotto

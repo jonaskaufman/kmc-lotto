@@ -6,11 +6,11 @@
 #include <limits>
 #include <random>
 
+namespace lotto
+{
 using UIntType = std::uint_fast64_t;
 using RealType = double;
 
-namespace lotto
-{
 /**
  * Random number generator
  *
