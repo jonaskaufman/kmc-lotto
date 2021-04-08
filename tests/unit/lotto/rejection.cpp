@@ -71,7 +71,7 @@ protected:
     }
 
     // Fixed seed for testing
-    const UIntType testing_seed = 0;
+    const lotto::UIntType testing_seed = 0;
 
     // Event id list
     std::vector<ID> event_id_list;

@@ -11,7 +11,7 @@ protected:
     lotto::RandomGenerator generator;
 
     /// Fixed seed for testing
-    const UIntType testing_seed = 0;
+    const lotto::UIntType testing_seed = 0;
 
     /// Checks that samples satisfy bounds and expected mean for a uniform
     //  distribution between min_value and max_value
@@ -42,7 +42,7 @@ TEST_F(RandomGeneratorTest, Construct)
 TEST_F(RandomGeneratorTest, GetSeed)
 {
     // Checks if get_seed returns the correct value
-    for (UIntType i = 0; i < 100; ++i)
+    for (lotto::UIntType i = 0; i < 100; ++i)
     {
         generator.reseed_generator(i);
         EXPECT_EQ(generator.get_seed(), i);
@@ -52,7 +52,7 @@ TEST_F(RandomGeneratorTest, GetSeed)
 TEST_F(RandomGeneratorTest, DefaultSeedNotFixed)
 {
     // Checks that the default seed is not fixed
-    UIntType first_seed = generator.get_seed();
+    lotto::UIntType first_seed = generator.get_seed();
     bool is_seed_different = false;
     int n_attempts = 100;
     for (int i = 0; i < n_attempts; ++i)
@@ -72,10 +72,10 @@ TEST_F(RandomGeneratorTest, IntegerRangeSamples)
 {
     // Checks that values from sample_integer_range behave as expected
     generator.reseed_generator(testing_seed); // fixed seed for testing
-    UIntType min_value = 0;
-    UIntType max_value = 1000;
+    lotto::UIntType min_value = 0;
+    lotto::UIntType max_value = 1000;
     int n_samples = 100000000;
-    std::vector<UIntType> samples(n_samples);
+    std::vector<lotto::UIntType> samples(n_samples);
     for (int i = 0; i < n_samples; ++i)
     {
         samples[i] = generator.sample_integer_range(max_value);
