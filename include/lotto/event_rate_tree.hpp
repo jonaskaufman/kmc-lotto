@@ -41,7 +41,7 @@ private:
     EventRateNodeData();
 
     // Event ID, which may not exist
-    const std::optional<EventIDType> event_id;
+    std::optional<EventIDType> event_id;
 
     // Event rate or summed rate
     double rate;
@@ -92,6 +92,11 @@ private:
     // Based on the rate of the children nodes, pick the left or right
     // child, and subtract the rate out
     const Node* bifurcate(const Node* current_node_ptr, double& running_rate) const;
+
+    // Access leaf data, for testing
+    std::vector<NodeData> leaf_data() const;
+    std::vector<EventIDType> leaf_ids() const;
+    std::vector<double> leaf_rates() const;
 
     // Friend for testing
     friend class ::EventRateTreeTest;

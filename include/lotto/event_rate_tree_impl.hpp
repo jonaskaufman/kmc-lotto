@@ -3,6 +3,7 @@
 
 #include "event_rate_tree.hpp"
 #include "sum_tree.hpp"
+#include "sum_tree_impl.hpp"
 
 namespace lotto
 {
@@ -48,7 +49,10 @@ template <typename EventIDType>
 EventRateNodeData<EventIDType>::EventRateNodeData() : event_id{std::nullopt}, rate(0.0){};
 
 template <typename EventIDType>
-using Node = InvertedBinaryTreeNode<EventRateNodeData<EventIDType>>;
+using NodeData = EventRateNodeData<EventIDType>;
+
+template <typename EventIDType>
+using Node = InvertedBinaryTreeNode<NodeData<EventIDType>>;
 
 template <typename EventIDType>
 EventRateTree<EventIDType>::EventRateTree(const std::vector<EventIDType>& all_event_ids,
@@ -76,7 +80,7 @@ template <typename EventIDType>
 void EventRateTree<EventIDType>::update_rate(const EventIDType& event_id, double new_rate)
 {
     auto leaf_ix = event_to_leaf_index.at(event_id);
-    EventRateNodeData<EventIDType>& event_data = event_rate_tree.leaves()[leaf_ix]->data;
+    NodeData& event_data = event_rate_tree.leaves()[leaf_ix]->data;
     event_data.update_rate(new_rate);
     event_rate_tree.update(leaf_ix, event_data);
 }
@@ -107,7 +111,7 @@ EventRateTree<EventIDType>::events_as_leaves(const std::vector<EventIDType>& ini
 {
     std::vector<EventRateNodeData<EventIDType>> event_leaves;
     auto rate_it = init_rates.begin();
-    for (auto event_it = init_events.begin(); event_it != init_events.end; ++event_it)
+    for (auto event_it = init_events.begin(); event_it != init_events.end(); ++event_it)
     {
         event_leaves.emplace_back(*event_it, *rate_it);
         ++rate_it;
@@ -118,15 +122,59 @@ EventRateTree<EventIDType>::events_as_leaves(const std::vector<EventIDType>& ini
 template <typename EventIDType>
 const Node<EventIDType>* EventRateTree<EventIDType>::bifurcate(const Node* current_node_ptr, double& running_rate) const
 {
-    if (running_rate < current_node_ptr->left_child->data.get_rate())
+    if (current_node_ptr->left_child == nullptr && current_node_ptr->right_child == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (current_node_ptr->left_child != nullptr && running_rate < current_node_ptr->left_child->data.get_rate())
     {
         return current_node_ptr->left_child;
     }
     else
     {
-        running_rate -= current_node_ptr->left_child->data.get_rate();
+        if (current_node_ptr->left_child != nullptr)
+        {
+            running_rate -= current_node_ptr->left_child->data.get_rate();
+        }
         return current_node_ptr->right_child;
     }
+}
+
+template <typename EventIDType>
+std::vector<NodeData<EventIDType>> EventRateTree<EventIDType>::leaf_data() const
+{
+    std::vector<NodeData> leaf_data;
+    const auto& tree_leaves = this->event_rate_tree.leaves();
+    for (auto leaf_it = tree_leaves.begin(); leaf_it != tree_leaves.end(); ++leaf_it)
+    {
+        leaf_data.emplace_back(leaf_it->get()->data);
+    }
+    return leaf_data;
+}
+
+template <typename EventIDType>
+std::vector<EventIDType> EventRateTree<EventIDType>::leaf_ids() const
+{
+    auto leaf_data = this->leaf_data();
+    std::vector<EventIDType> leaf_ids;
+    for (auto data : leaf_data)
+    {
+        leaf_ids.push_back(data.get_event_id());
+    }
+    return leaf_ids;
+}
+
+template <typename EventIDType>
+std::vector<double> EventRateTree<EventIDType>::leaf_rates() const
+{
+    auto leaf_data = this->leaf_data();
+    std::vector<double> leaf_rates;
+    for (auto data : leaf_data)
+    {
+        leaf_rates.push_back(data.get_rate());
+    }
+    return leaf_rates;
 }
 
 } // namespace lotto

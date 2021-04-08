@@ -3,6 +3,7 @@
 #include <lotto/event_rate_tree.hpp>
 #include <lotto/event_rate_tree_impl.hpp>
 #include <memory>
+#include <numeric>
 
 using ID = int;
 
@@ -73,7 +74,97 @@ TEST_F(EventRateNodeDataTest, Addition)
 
 class EventRateTreeTest : public testing::Test
 {
+protected:
+    void SetUp() override
+    {
+        generator.reseed_generator(testing_seed);
+        for (int i = 0; i < n_events; ++i)
+        {
+            init_ids.push_back(i); // TODO initialize out of order?
+            init_rates.push_back(generator.sample_unit_interval());
+        }
+        tree_ptr = std::make_unique<lotto::EventRateTree<ID>>(init_ids, init_rates);
+    }
+
+    // Random generator
+    lotto::RandomGenerator generator;
+
+    // Fixed seed for testing
+    const lotto::UIntType testing_seed = 0;
+
+    // Pointer to event rate tree
+    std::unique_ptr<lotto::EventRateTree<ID>> tree_ptr;
+
+    // Number of events, initals IDs and rates
+    int n_events = 1000;
+    std::vector<ID> init_ids;
+    std::vector<double> init_rates;
+
+    const std::map<ID, lotto::Index>& event_to_leaf_index() const { return tree_ptr->event_to_leaf_index; }
+
+    std::vector<ID> get_leaf_ids() const { return tree_ptr->leaf_ids(); }
+
+    std::vector<double> get_leaf_rates() const { return tree_ptr->leaf_rates(); }
+
+    std::vector<double> get_cumulative_leaf_rates() const
+    {
+        std::vector<double> cumulative_rates;
+        double rate_sum = 0.0;
+        for (double rate : get_leaf_rates())
+        {
+            rate_sum += rate;
+            cumulative_rates.push_back(rate_sum);
+        }
+        return cumulative_rates;
+    }
 };
+
+TEST_F(EventRateTreeTest, Construct) {}
+
+TEST_F(EventRateTreeTest, TotalRate)
+{
+    // Checks that the total rate returned is correct
+    double rate_sum = std::accumulate(init_rates.begin(), init_rates.end(), 0.0);
+    EXPECT_DOUBLE_EQ(tree_ptr->total_rate(), rate_sum);
+}
+
+TEST_F(EventRateTreeTest, UpdateRate)
+{
+    // Checks that the individual and total rates change appropriately upon updating
+    int n_updates = 100;
+    for (int i = 0; i < n_updates; ++i)
+    {
+        ID id_to_update = generator.sample_integer_range(n_events - 1);
+        auto leaf_ix = event_to_leaf_index().at(id_to_update);
+        double new_rate = generator.sample_unit_interval();
+        double delta_rate = new_rate - get_leaf_rates()[leaf_ix];
+        double old_total_rate = tree_ptr->total_rate();
+
+        tree_ptr->update_rate(id_to_update, new_rate);
+        EXPECT_EQ(new_rate, get_leaf_rates()[leaf_ix]);
+        double new_total_rate = tree_ptr->total_rate();
+        EXPECT_DOUBLE_EQ(new_total_rate, old_total_rate + delta_rate);
+    }
+}
+
+TEST_F(EventRateTreeTest, Query)
+{
+    // Check thats querying the tree returns the correct event ID, based on the cumulative rates
+    double total_rate = tree_ptr->total_rate();
+    auto cumulative_rates = get_cumulative_leaf_rates();
+    int n_queries = 100;
+    for (int i = 0; i < n_queries; ++i)
+    {
+        double query_value = total_rate * generator.sample_unit_interval();
+        ID result = tree_ptr->query_tree(query_value);
+        auto result_leaf_ix = event_to_leaf_index().at(result);
+        EXPECT_LE(query_value, cumulative_rates[result_leaf_ix]);
+        if (result_leaf_ix != 0)
+        {
+            EXPECT_GT(query_value, cumulative_rates[result_leaf_ix - 1]);
+        }
+    }
+}
 
 int main(int argc, char** argv)
 {
