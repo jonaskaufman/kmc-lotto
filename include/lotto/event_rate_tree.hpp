@@ -17,35 +17,23 @@ class EventRateNodeData
 {
 public:
     // Construct as a leaf given an event ID and rate
-    EventRateNodeData(const EventIDType& event_id, double rate) : event_id(event_id), rate(rate){};
+    EventRateNodeData(const EventIDType& event_id, double rate);
 
     // Return the node's event ID (should only be called on leaves)
-    const EventIDType& get_event_id() const { return event_id.value(); }
+    const EventIDType& get_event_id() const;
 
     // Return the node's rate
-    double get_rate() const { return rate; }
+    double get_rate() const;
 
     // Update a node's rate, if it stores no event ID
-    void update_rate(double new_rate)
-    {
-        if (event_id.has_value())
-        {
-            rate = new_rate;
-        }
-        return;
-    }
+    void update_rate(double new_rate);
 
     // Return a new node with no event ID and summed rates
-    EventRateNodeData operator+(const EventRateNodeData& rhs_node) const
-    {
-        EventRateNodeData summed_node;
-        summed_node.rate = this->rate + rhs_node.rate;
-        return summed_node;
-    }
+    EventRateNodeData operator+(const EventRateNodeData& rhs_node) const;
 
 private:
     // Construct as a non-leaf with no event ID and zero rate
-    EventRateNodeData() : event_id{std::nullopt}, rate(0.0){};
+    EventRateNodeData();
 
     // Event ID, which may not exist
     const std::optional<EventIDType> event_id;
@@ -89,7 +77,7 @@ private:
 
     //
     std::vector<NodeData> events_as_leaves(const std::vector<EventIDType>& init_events,
-                                           const std::vector<double>& init_rates);
+                                           const std::vector<double>& init_rates) const;
 
     //
     std::map<EventIDType, Index> event_to_leaf_index_map() const;
