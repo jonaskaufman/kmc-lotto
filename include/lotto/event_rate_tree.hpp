@@ -5,6 +5,9 @@
 #include <map>
 #include <optional>
 
+class EventRateNodeDataTest;
+class EventRateTreeTest;
+
 namespace lotto
 {
 using Index = long int;
@@ -27,7 +30,7 @@ public:
     // Return the node's rate
     double get_rate() const;
 
-    // Update a node's rate, if it stores no event ID
+    // Update a node's rate, if it stores an event ID
     void update_rate(double new_rate);
 
     // Return a new node with no event ID and summed rates
@@ -42,6 +45,9 @@ private:
 
     // Event rate or summed rate
     double rate;
+
+    // Friend for testing
+    friend class ::EventRateNodeDataTest;
 };
 
 /*
@@ -87,6 +93,8 @@ private:
     // child, and subtract the rate out
     const Node* bifurcate(const Node* current_node_ptr, double& running_rate) const;
 
+    // Friend for testing
+    friend class ::EventRateTreeTest;
 };
 
 } // namespace lotto

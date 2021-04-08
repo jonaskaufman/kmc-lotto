@@ -12,3 +12,10 @@ check_rejection_SOURCES =\
 check_rejection_LDADD=\
 				   libgtest.la
 
+TESTS += check_event_rate_tree
+check_PROGRAMS += check_event_rate_tree
+check_event_rate_tree_SOURCES =\
+					  tests/unit/lotto/event_rate_tree.cpp
+check_event_rate_tree_LDADD=\
+				   libgtest.la
+
