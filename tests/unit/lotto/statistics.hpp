@@ -1,3 +1,6 @@
+#ifndef STATISTICS_H
+#define STATISTICS_H
+
 #include <cmath>
 #include <gtest/gtest.h>
 #include <numeric>
@@ -30,3 +33,5 @@ check_deviation_of_mean(double mean, double expected_mean, double standard_error
 {
     EXPECT_LE(std::abs(mean - expected_mean), sigma_tolerance * standard_error_of_mean);
 }
+
+#endif
