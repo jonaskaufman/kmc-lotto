@@ -1,3 +1,4 @@
+#include "test_parameters.hpp"
 #include "statistics.hpp"
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -9,9 +10,6 @@ class RandomGeneratorTest : public testing::Test
 protected:
     /// Random generator for testing
     lotto::RandomGenerator generator;
-
-    /// Fixed seed for testing
-    const lotto::UIntType testing_seed = 0;
 
     /// Checks that samples satisfy bounds and expected mean for a uniform
     //  distribution between min_value and max_value
@@ -29,8 +27,8 @@ protected:
         double expected_mean = (double)(min_value + max_value) / 2.0;
         double sigma_of_mean =
             standard_error_of_mean(standard_deviation_of_uniform_distribution(min_value, max_value), samples.size());
-        // Mean of samples should be *well* within 10 sigma of expected value
-        check_deviation_of_mean(mean, expected_mean, sigma_of_mean, 10);
+        // Check if mean of samples is within TEST_SIGMA standard_deviations of expected value
+        check_deviation_of_mean(mean, expected_mean, sigma_of_mean, TEST_SIGMA);
     }
 };
 
@@ -71,7 +69,7 @@ TEST_F(RandomGeneratorTest, DefaultSeedNotFixed)
 TEST_F(RandomGeneratorTest, IntegerRangeSamples)
 {
     // Checks that values from sample_integer_range behave as expected
-    generator.reseed_generator(testing_seed); // fixed seed for testing
+    generator.reseed_generator(TEST_SEED); // fixed seed for testing
     lotto::UIntType min_value = 0;
     lotto::UIntType max_value = 1000;
     int n_samples = 100000000;
@@ -86,7 +84,7 @@ TEST_F(RandomGeneratorTest, IntegerRangeSamples)
 TEST_F(RandomGeneratorTest, UnitIntervalSamples)
 {
     // Checks that values from sample_unit_interval behave as expected
-    generator.reseed_generator(testing_seed); // fixed seed for testing
+    generator.reseed_generator(TEST_SEED); // fixed seed for testing
     double min_value = 0.0;
     double max_value = 1.0;
     int n_samples = 100000000;

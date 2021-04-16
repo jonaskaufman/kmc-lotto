@@ -8,7 +8,7 @@ template <typename EventIDType>
 class UniformRateCalculator
 {
 public:
-    UniformRateCalculator(double rate = 1.0) : rate(rate) {}
+    UniformRateCalculator(double rate) : rate(rate) {}
     double calculate_rate(const EventIDType& event_id) const { return rate; }
     double get_rate() const { return rate; }
     void set_rate(double new_rate) { rate = new_rate; }
@@ -25,7 +25,7 @@ template <typename EventIDType>
 class OneHotRateCalculator
 {
 public:
-    OneHotRateCalculator(const EventIDType& hot_id = 0) : hot_id(hot_id) {}
+    OneHotRateCalculator(const EventIDType& hot_id) : hot_id(hot_id) {}
     double calculate_rate(const EventIDType& event_id) const
     {
         if (event_id == hot_id)

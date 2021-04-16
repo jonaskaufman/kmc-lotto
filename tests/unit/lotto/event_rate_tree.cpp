@@ -1,4 +1,5 @@
 #include "lotto/random.hpp"
+#include "test_parameters.hpp"
 #include <gtest/gtest.h>
 #include <lotto/event_rate_tree.hpp>
 #include <lotto/event_rate_tree_impl.hpp>
@@ -77,7 +78,7 @@ class EventRateTreeTest : public testing::Test
 protected:
     void SetUp() override
     {
-        generator.reseed_generator(testing_seed);
+        generator.reseed_generator(TEST_SEED);
         for (int i = 0; i < n_events; ++i)
         {
             ID id = 7 * i;
@@ -89,9 +90,6 @@ protected:
 
     // Random generator
     lotto::RandomGenerator generator;
-
-    // Fixed seed for testing
-    const lotto::UIntType testing_seed = 0;
 
     // Pointer to event rate tree
     std::unique_ptr<lotto::EventRateTree<ID>> tree_ptr;
