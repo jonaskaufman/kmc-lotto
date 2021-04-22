@@ -35,17 +35,17 @@ public:
         }
     }
 
-    // Attempts events, repeats until an event is accepted and returns the ID of selected event and total time step
+    // Attempts events, repeats until an event is accepted and returns the ID of selected event and accumulated time step
     std::pair<EventIDType, double> select_event()
     {
         EventIDType selected_event_id;
-        double total_time_step = 0;
+        double accumulated_time_step = 0;
         double total_rate = rate_upper_bound * event_id_list.size();
         // This could loop forever, but I don't think it makes sense to impose a limit or ask the user to do so
         // TODO: Make note in documentation about this
         while (true)
         {
-            total_time_step += this->calculate_time_step(total_rate);
+            accumulated_time_step += this->calculate_time_step(total_rate);
             EventIDType candidate_event_id = event_id_list[this->random_generator.sample_integer_range(event_id_list.size() - 1)];
             double rate = this->calculate_rate(candidate_event_id);
             assert(rate <= rate_upper_bound); // rate cannot exceed upper bound
@@ -55,7 +55,7 @@ public:
                 break;
             }
         }
-        return std::make_pair(selected_event_id, total_time_step);
+        return std::make_pair(selected_event_id, accumulated_time_step);
     }
 
 private:

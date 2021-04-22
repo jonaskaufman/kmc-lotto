@@ -84,16 +84,16 @@ private:
         return;
     }
 
-    // Add missing event IDs to impact table (with empty vectors as values) and return it
+    // Add missing event IDs to an impact table (with empty vectors as values) and return it
     std::map<EventIDType, std::vector<EventIDType>>
-    fill_impact_table(std::map<EventIDType, std::vector<EventIDType>> impact_table,
+    fill_impact_table(std::map<EventIDType, std::vector<EventIDType>> table_to_fill,
                       std::vector<EventIDType> event_id_list)
     {
         for (const EventIDType& event_id : event_id_list)
         {
-            impact_table[event_id];
+            table_to_fill[event_id];
         }
-        return impact_table;
+        return table_to_fill;
     }
 
     // Friend for testing
