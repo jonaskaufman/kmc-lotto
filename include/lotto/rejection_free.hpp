@@ -4,6 +4,7 @@
 #include "event_rate_tree.hpp"
 #include "event_rate_tree_impl.hpp"
 #include "event_selector.hpp"
+#include <cassert>
 #include <map>
 #include <memory>
 #include <vector>
@@ -26,7 +27,7 @@ public:
                                const std::map<EventIDType, std::vector<EventIDType>>& impact_table)
         : EventSelectorBase<EventIDType, RateCalculatorType>(rate_calculator_ptr),
           event_rate_tree(event_id_list, this->calculate_rates(event_id_list)),
-          impact_table(impact_table),
+          impact_table(fill_impact_table(impact_table, event_id_list)),
           impacted_events_ptr(nullptr)
     {
     }
@@ -64,7 +65,7 @@ private:
     // Set the impact events pointer based on an accepted event ID
     void set_impacted_events(const EventIDType& accepted_event_id)
     {
-        // TODO: Check that ptr is null?
+        assert(impacted_events_ptr == nullptr); // pointer should be null before proceeding
         impacted_events_ptr = &impact_table.at(accepted_event_id);
         return;
     }
@@ -81,6 +82,18 @@ private:
             impacted_events_ptr = nullptr;
         }
         return;
+    }
+
+    // Add missing event IDs to impact table (with empty vectors as values) and return it
+    std::map<EventIDType, std::vector<EventIDType>>
+    fill_impact_table(std::map<EventIDType, std::vector<EventIDType>> impact_table,
+                      std::vector<EventIDType> event_id_list)
+    {
+        for (const EventIDType& event_id : event_id_list)
+        {
+            impact_table[event_id];
+        }
+        return impact_table;
     }
 
     // Friend for testing

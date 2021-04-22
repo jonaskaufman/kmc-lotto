@@ -4,6 +4,7 @@
 #include "event_rate_tree.hpp"
 #include "sum_tree.hpp"
 #include "sum_tree_impl.hpp"
+#include <cassert>
 
 namespace lotto
 {
@@ -65,7 +66,9 @@ EventRateTree<EventIDType>::EventRateTree(const std::vector<EventIDType>& all_ev
 template <typename EventIDType>
 const EventIDType& EventRateTree<EventIDType>::query_tree(double query_value) const
 {
-    // TODO: Check that query value does not exceed total rate
+    assert(query_value > 0);             // query value must be positive
+    assert(query_value <= total_rate()); // query value cannot exceed total rate
+
     auto next_node_ptr = event_rate_tree.root();
     const Node* last_node_ptr = nullptr;
     while (next_node_ptr != nullptr)
