@@ -51,7 +51,7 @@ private:
 };
 
 /*
- * Tree of event rates, with events as leaves
+ * Class to contain a binary sum tree of event rates, with events as leaves
  */
 template <typename EventIDType>
 class EventRateTree
@@ -64,7 +64,6 @@ public:
     // for which R(i-1) < u <= R(i), where u is the query value
     // and R(i) is cumulative rate of all events up to and including event i
     const EventIDType& query_tree(double query_value) const;
-    // Should this take scale for total rate automatically?
 
     // Update the rate of a specific event
     void update_rate(const EventIDType& event_id, double new_rate);

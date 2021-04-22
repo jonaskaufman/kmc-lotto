@@ -1,5 +1,5 @@
-#include "test_parameters.hpp"
 #include "statistics.hpp"
+#include "test_parameters.hpp"
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <lotto/random.hpp>
@@ -10,26 +10,6 @@ class RandomGeneratorTest : public testing::Test
 protected:
     /// Random generator for testing
     lotto::RandomGenerator generator;
-
-    /// Checks that samples satisfy bounds and expected mean for a uniform
-    //  distribution between min_value and max_value
-    template <typename T>
-    void check_samples_from_uniform_distribution(T min_value, T max_value, std::vector<T> samples)
-    {
-        // Check min and max
-        T max_sample = *std::max_element(samples.begin(), samples.end());
-        T min_sample = *std::min_element(samples.begin(), samples.end());
-        EXPECT_GE(min_sample, min_value);
-        EXPECT_LE(max_sample, max_value);
-
-        // Check mean
-        double mean = get_mean(samples);
-        double expected_mean = (double)(min_value + max_value) / 2.0;
-        double sigma_of_mean =
-            standard_error_of_mean(standard_deviation_of_uniform_distribution(min_value, max_value), samples.size());
-        // Check if mean of samples is within TEST_SIGMA standard_deviations of expected value
-        check_deviation_of_mean(mean, expected_mean, sigma_of_mean, TEST_SIGMA);
-    }
 };
 
 TEST_F(RandomGeneratorTest, Construct)

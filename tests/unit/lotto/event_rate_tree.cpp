@@ -1,4 +1,5 @@
 #include "lotto/random.hpp"
+#include "sequences.hpp"
 #include "test_parameters.hpp"
 #include <gtest/gtest.h>
 #include <lotto/event_rate_tree.hpp>
@@ -6,11 +7,11 @@
 #include <memory>
 #include <numeric>
 
-using ID = int;
-
 class EventRateNodeDataTest : public testing::Test
 {
 protected:
+    using ID = int;
+
     void SetUp() override
     {
         data_a_ptr = std::make_unique<lotto::EventRateNodeData<ID>>(id_a, rate_a);
@@ -31,7 +32,7 @@ protected:
     // Default constructed node data (no event ID, zero rate)
     lotto::EventRateNodeData<ID> non_leaf_node_data;
 
-    // Check if node data contains an event ID
+    // Checks if node data contains an event ID
     bool has_event_id(const lotto::EventRateNodeData<ID>& data) const { return data.event_id.has_value(); }
 };
 
@@ -76,15 +77,23 @@ TEST_F(EventRateNodeDataTest, Addition)
 class EventRateTreeTest : public testing::Test
 {
 protected:
+    using ID = int;
+
     void SetUp() override
     {
+        // Reseed generator for testing
         generator.reseed_generator(TEST_SEED);
+
+        // Set up event IDs
+        init_ids = hashed_sequence(n_events);
+
+        // Set up initial rates
         for (int i = 0; i < n_events; ++i)
         {
-            ID id = 7 * i;
-            init_ids.push_back(id);
             init_rates.push_back(generator.sample_unit_interval());
         }
+
+        // Set up tree
         tree_ptr = std::make_unique<lotto::EventRateTree<ID>>(init_ids, init_rates);
     }
 
@@ -99,12 +108,16 @@ protected:
     std::vector<ID> init_ids;
     std::vector<double> init_rates;
 
+    // Gets map from event ID to index in the tree leaves
     const std::map<ID, lotto::Index>& event_to_leaf_index() const { return tree_ptr->event_to_leaf_index; }
 
+    // Returns the event IDs of the tree leaves
     std::vector<ID> get_leaf_ids() const { return tree_ptr->leaf_ids(); }
 
+    // Returns the rates of the tree leaves
     std::vector<double> get_leaf_rates() const { return tree_ptr->leaf_rates(); }
 
+    // Returns the cumulative rates of the tree leaves
     std::vector<double> get_cumulative_leaf_rates() const
     {
         std::vector<double> cumulative_rates;
