@@ -2,10 +2,13 @@
 #define REJECTION_FREE_H
 
 #include "event_rate_tree.hpp"
+#include "event_rate_tree_impl.hpp"
 #include "event_selector.hpp"
 #include <map>
 #include <memory>
 #include <vector>
+
+class RejectionFreeEventSelectorTest;
 
 namespace lotto
 {
@@ -22,13 +25,13 @@ public:
                                const std::vector<EventIDType>& event_id_list,
                                const std::map<EventIDType, std::vector<EventIDType>>& impact_table)
         : EventSelectorBase<EventIDType, RateCalculatorType>(rate_calculator_ptr),
-          event_rate_tree(event_id_list, calculate_rates(event_id_list)),
+          event_rate_tree(event_id_list, this->calculate_rates(event_id_list)),
           impact_table(impact_table),
           impacted_events_ptr(nullptr)
     {
     }
 
-    // Selects an event and returns its ID and the time step
+    // Select an event and return its ID and the time step
     std::pair<EventIDType, double> select_event()
     {
         // Because this function only selects events and does not process them,
@@ -41,10 +44,10 @@ public:
 
         // Query tree to select event
         double query_value = total_rate * this->random_generator.sample_unit_interval();
-        EventIDType& selected_event_id = event_rate_tree.query_tree(query_value);
+        EventIDType selected_event_id = event_rate_tree.query_tree(query_value);
 
-        // Update impacted and return
-        impacted_events_ptr = &impact_table.at(selected_event_id);
+        // Update impacted event list and return
+        set_impacted_events(selected_event_id);
         return std::make_pair(selected_event_id, time_step);
     }
 
@@ -58,6 +61,14 @@ private:
     // Pointer to vector of impacted events whose rates have not been updated
     mutable const std::vector<EventIDType>* impacted_events_ptr;
 
+    // Set the impact events pointer based on an accepted event ID
+    void set_impacted_events(const EventIDType& accepted_event_id)
+    {
+        // TODO: Check that ptr is null?
+        impacted_events_ptr = &impact_table.at(accepted_event_id);
+        return;
+    }
+
     // Update the stored rates for impacted events
     void update_impacted_event_rates()
     {
@@ -65,12 +76,15 @@ private:
         {
             for (const EventIDType& event_id : *impacted_events_ptr)
             {
-                event_rate_tree.update_rate(event_id, calculate_rate(event_id));
+                event_rate_tree.update_rate(event_id, this->calculate_rate(event_id));
             }
             impacted_events_ptr = nullptr;
         }
         return;
     }
+
+    // Friend for testing
+    friend class ::RejectionFreeEventSelectorTest;
 };
 } // namespace lotto
 
