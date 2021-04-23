@@ -130,7 +130,7 @@ const Node<EventIDType>* EventRateTree<EventIDType>::bifurcate(const Node* curre
         return nullptr;
     }
 
-    if (current_node_ptr->left_child != nullptr && running_rate < current_node_ptr->left_child->data.get_rate())
+    if (current_node_ptr->left_child != nullptr && running_rate <= current_node_ptr->left_child->data.get_rate())
     {
         return current_node_ptr->left_child;
     }

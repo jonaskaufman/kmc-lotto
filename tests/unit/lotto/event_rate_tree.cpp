@@ -172,7 +172,7 @@ TEST_F(EventRateTreeTest, UpdateRate)
     }
 }
 
-TEST_F(EventRateTreeTest, Query)
+TEST_F(EventRateTreeTest, RandomQuery)
 {
     // Check thats querying the tree returns the correct event ID, based on the cumulative rates
     double total_rate = tree_ptr->total_rate();
@@ -188,6 +188,27 @@ TEST_F(EventRateTreeTest, Query)
         {
             EXPECT_GT(query_value, cumulative_rates[result_leaf_ix - 1]);
         }
+    }
+}
+
+TEST_F(EventRateTreeTest, EdgeQuery)
+{
+    // Checks that correct event is selected in edge case where query value is exactly equal to a cumulative rate
+
+    // Set all rates to 1
+    for (const ID& id : init_ids)
+    {
+        tree_ptr->update_rate(id, 1.0);
+    }
+
+    // Leaves indexed from 0, so leaf i should have cumulative rate i + 1
+    // Query integers and check that the leaf with the correct index is chosen
+    for (int i = 0; i < n_events; ++i)
+    {
+        int query_value = i + 1;
+        ID result = tree_ptr->query_tree(query_value);
+        auto result_leaf_ix = event_to_leaf_index().at(result);
+        EXPECT_EQ(i, result_leaf_ix);
     }
 }
 

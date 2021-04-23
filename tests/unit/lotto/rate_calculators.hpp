@@ -44,4 +44,32 @@ private:
     EventIDType hot_id;
 };
 
+/*
+ *  Rate calculator that returns one rate for even number ids and another for odd number ids
+ */
+class EvenOddRateCalculator
+{
+public:
+    EvenOddRateCalculator(double even_rate, double odd_rate) : even_rate(even_rate), odd_rate(odd_rate) {}
+    double calculate_rate(const int& event_id) const
+    {
+        if (event_id % 2 == 0)
+        {
+            return even_rate;
+        }
+        else
+        {
+            return odd_rate;
+        }
+    }
+    double get_even_rate() const { return even_rate; }
+    double get_odd_rate() const { return odd_rate; }
+    void set_even_rate(double new_rate) { even_rate = new_rate; }
+    void set_odd_rate(double new_rate) { odd_rate = new_rate; }
+
+private:
+    double even_rate;
+    double odd_rate;
+};
+
 #endif
