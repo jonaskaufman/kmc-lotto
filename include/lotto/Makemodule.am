@@ -2,4 +2,9 @@ lotto_includedir = $(includedir)/lotto
 lotto_include_HEADERS = \
 						include/lotto/random.hpp\
 						include/lotto/event_selector.hpp\
-						include/lotto/rejection.hpp
+						include/lotto/rejection.hpp\
+						include/lotto/rejection_free.hpp\
+						include/lotto/event_rate_tree.hpp\
+						include/lotto/event_rate_tree_impl.hpp\
+						include/lotto/sum_tree.hpp\
+						include/lotto/sum_tree_impl.hpp
