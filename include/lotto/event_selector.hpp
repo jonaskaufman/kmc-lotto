@@ -25,6 +25,7 @@ protected:
     // Pointer to rate calculator
     const std::shared_ptr<RateCalculatorType> rate_calculator_ptr;
 
+    // TODO: Maybe take generator as shared_ptr if using multiple selectors at once
     // Random number generator
     RandomGenerator random_generator;
 

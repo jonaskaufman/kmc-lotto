@@ -43,6 +43,7 @@ public:
         double total_rate = rate_upper_bound * event_id_list.size();
         // This could loop forever, but I don't think it makes sense to impose a limit or ask the user to do so
         // TODO: Make note in documentation about this
+        // TODO: Give warning after a certain number of iterations (every N iterations)
         while (true)
         {
             accumulated_time_step += this->calculate_time_step(total_rate);
