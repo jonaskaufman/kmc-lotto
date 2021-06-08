@@ -7,6 +7,7 @@
 #include <cassert>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 class RejectionFreeEventSelectorTest;
@@ -30,6 +31,10 @@ public:
           impact_table(fill_impact_table(impact_table, event_id_list)),
           impacted_events_ptr(nullptr)
     {
+        if (event_id_list.empty())
+        {
+            throw std::runtime_error("Event ID list must not be empty.");
+        }
     }
 
     // Select an event and return its ID and the time step
@@ -85,9 +90,8 @@ private:
     }
 
     // Add missing event IDs to an impact table (with empty vectors as values) and return it
-    std::map<EventIDType, std::vector<EventIDType>>
-    fill_impact_table(std::map<EventIDType, std::vector<EventIDType>> table_to_fill,
-                      std::vector<EventIDType> event_id_list)
+    std::map<EventIDType, std::vector<EventIDType>> fill_impact_table(std::map<EventIDType, std::vector<EventIDType>> table_to_fill,
+                                                                      std::vector<EventIDType> event_id_list)
     {
         for (const EventIDType& event_id : event_id_list)
         {
