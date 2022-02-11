@@ -5,7 +5,7 @@ kmc-lotto is a simple C++ library that performs event selection for arbitrary ki
 
 This project is developed by the [Van der Ven group](https://labs.materials.ucsb.edu/vanderven/anton/) in the Materials Department at the University of California, Santa Barbara.
 The repository is written and maintained by me, Jonas Kaufman.
-Dr. John Goiri implemented the binary tree used for rejection-free event selection and Dr. Sanjeev Kolli provided guidance during development.
+[Dr. John Goiri](https://github.com/goirijo/) implemented the binary tree used for rejection-free event selection (and suggested the name "lotto") and [Dr. Sanjeev Kolli](https://github.com/skk74) provided guidance during development.
 
 ## Installation
 kmc-lotto is a header-only template library, so it does not need to be compiled on its own.
